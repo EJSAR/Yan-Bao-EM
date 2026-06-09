@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="zh-CN" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EJS Bird's Nest Enzyme | 燕屋升级方案</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&amp;family=Open+Sans:wght@400;600&amp;family=Inter:wght@600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Montserrat:wght@100..900&amp;family=Open+Sans:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#d5e3ff",
+                        "primary": "#001e40",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "on-primary-fixed": "#001b3c",
+                        "inverse-primary": "#a7c8ff",
+                        "on-background": "#181c1b",
+                        "surface-container": "#ebefed",
+                        "surface-bright": "#f7faf8",
+                        "on-primary-fixed-variant": "#1f477b",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-tertiary-fixed-variant": "#723610",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#737780",
+                        "surface-container-highest": "#e0e3e1",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#d8885c",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f1f4f2",
+                        "on-secondary-fixed": "#002204",
+                        "on-tertiary-fixed": "#341100",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e0e3e1",
+                        "tertiary": "#381300",
+                        "secondary-container": "#a0f399",
+                        "on-surface-variant": "#43474f",
+                        "on-surface": "#181c1b",
+                        "primary-container": "#003366",
+                        "surface": "#f7faf8",
+                        "on-secondary-fixed-variant": "#005312",
+                        "tertiary-container": "#592300",
+                        "on-secondary-container": "#217128",
+                        "surface-tint": "#3a5f94",
+                        "surface-container-high": "#e6e9e7",
+                        "background": "#f7faf8",
+                        "surface-dim": "#d7dbd9",
+                        "secondary": "#1b6d24",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c3c6d1",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#a3f69c",
+                        "inverse-on-surface": "#eef1ef",
+                        "primary-fixed-dim": "#a7c8ff",
+                        "on-primary-container": "#799dd6",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2d3130",
+                        "secondary-fixed-dim": "#88d982",
+                        "brand-orange": "#FF8C00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-mobile": "20px",
+                        "section-gap-mobile": "64px",
+                        "section-gap-desktop": "120px",
+                        "gutter": "24px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Montserrat"],
+                        "body-md": ["Open Sans"],
+                        "body-lg": ["Open Sans"],
+                        "headline-md": ["Montserrat"],
+                        "label-sm": ["Inter"],
+                        "display-lg-mobile": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-sm": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hero-gradient {
+            background: linear-gradient(90deg, rgba(247, 250, 248, 0.95) 0%, rgba(247, 250, 248, 0.8) 50%, rgba(247, 250, 248, 0) 100%);
+        }
+        .glow-orange {
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+        }
+        [data-lang="en"] { display: none; }
+        .lang-en [data-lang="zh"] { display: none; }
+        .lang-en [data-lang="en"] { display: block; }
+        .lang-en [data-lang-inline="zh"] { display: none; }
+        .lang-en [data-lang-inline="en"] { display: inline; }
+        [data-lang-inline="en"] { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<!-- Header / TopAppBar -->
+<header class="bg-surface/90 backdrop-blur-md shadow-sm fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16">
+<div class="flex items-center gap-2">
+<img alt="EJS Logo" class="h-10 w-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-cWrAnbh9bEkInxc9etnOZ1tqgjwXbzgrBoKixVpUaP1UwChVrR10U27GHyJbqsfbnF4Sa_qMbgc2dq26UbCg3fPYO5u7UDIloizKuvbRr7XZCLPvslJJVoxGRrRojtc9aZUuFQNopR6SP9c9xqLOfE_Ln_plt0tCbBbQjcx9G65eM65eBybnE9tXlC4IWSw4uIz9fjDqwh-Y8rb-FCSzSdLHiErOJ7Om_f4CneN60d1yxDlwv5eNbJK_8G1RsMnPw1n1-ymttPdn"/>
+<span class="text-headline-md font-headline-md font-bold text-primary" data-lang="zh">燕宝菌酵素 1L</span>
+<span class="text-headline-md font-headline-md font-bold text-primary" data-lang="en">Yan Bao Enzyme 1L</span>
+</div>
+<button class="text-label-sm font-label-sm px-4 py-2 border border-outline rounded-lg text-primary hover:bg-surface-container transition-colors" onclick="toggleLanguage()">
+<span data-lang="zh">EN/CN</span>
+<span data-lang="en">CN/EN</span>
+</button>
+</header>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative min-h-[90vh] flex items-center overflow-hidden">
+<!-- Background Image -->
+<div class="absolute inset-0 z-0">
+<img alt="Bird's Nest Farm Interior" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARjOuoI5rRB7b4Cu2uu6feTx4_r3X9TGq1pLUaUAHErRAq5BQsLfx2ZSR2UIyyzbnEIRQtiB9aFMqKP9ePlIzoLFfLyicysyvoVNsjwImknUYzEUHfvWB2x4Y85eXsbl3yzbAewlAcyseAZZUFYTGAWZbaB8vjdNkhwZzHUlJ-BWrYv1J3SdtYDFHazfYSXHjx93wi8Mk7u_n0oF49GflbocN59oQ4Nz2kthiFf4VypfhaUlyJSknpC9DfaVjEvD3-W92ZG0Nfc8Y0"/>
+<div class="absolute inset-0 hero-gradient"></div>
+</div>
+<div class="container mx-auto px-margin-mobile relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-section-gap-mobile">
+<div class="space-y-6">
+<div class="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[18px]">science</span>
+<span data-lang="zh">100% 天然生物配方</span>
+<span data-lang="en">100% Natural Biological Formula</span>
+</div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary leading-tight md:text-display-lg md:font-display-lg">
+<span data-lang="zh">燕屋建好了，燕子却不肯<span class="text-secondary">‘入伙’</span>？</span>
+<span data-lang="en">Swiftlet House Ready, But Birds Won't <span class="text-secondary">'Move In'</span>?</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+<span data-lang="zh">专为1-3间燕屋的中小燕农与新手打造！核心天然生物配方，一喷全面改善燕屋环境、降解亚硝酸盐与恶臭，轻松提升住屋率与毛燕窝品质！</span>
+<span data-lang="en">Designed for small to medium swiftlet farmers and beginners! Core natural bio-formula: one spray improves environment, reduces nitrites and odors, boosting occupancy and nest quality!</span>
+</p>
+<div class="pt-4">
+<a class="inline-flex items-center justify-center bg-brand-orange text-white font-bold text-lg px-8 py-5 rounded-xl glow-orange hover:scale-105 transition-transform text-center w-full md:w-auto" href="#offer">
+<span data-lang="zh">👉 【限时优惠】立即领取 RM100 燕屋升级方案</span>
+<span data-lang="en">👉 [Limited Offer] Get RM100 Upgrade Plan Now</span>
+</a>
+</div>
+</div>
+<!-- Product Overlay -->
+<div class="relative flex justify-center md:justify-end">
+<div class="relative w-72 md:w-96 group">
+<img alt="EJS Bird's Nest Enzyme - 2 Bottles Pack" class="w-full drop-shadow-2xl animate-pulse-slow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqUr2uabSvtf18-x5ADTK4Atbc3Bdoz2Js-motqX7ZcpZ1BPJKQSz3w9N1xw2rS01FwAsDwvvLZ1aw9tOk3zEMFSzBYCUJDB36R04xYTxBXIvavQbf8MH15uTH0UZFRR6EJ6uMiv4_EEeaLNxYz5PV952S0JXqAhT8lB2WBPDEoVAmJxqVJclRGbD0d-Ihk40feLDN3aXjpyOyC8UTuCbw8zA1rdualiDErDzaEwWlj3_ik2YYFCgUzz5pKiEAeDPsik2H3YtlQ7Vc"/>
+<!-- Floating Badge -->
+<div class="absolute -top-4 -right-4 bg-primary text-white p-4 rounded-full shadow-xl flex flex-col items-center justify-center h-24 w-24 border-4 border-white">
+<span class="text-label-sm" data-lang="zh">仅需</span>
+<span class="text-label-sm" data-lang="en">Only</span>
+<span class="font-bold text-xl">RM100</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Problem Section (Bento Style) -->
+<section class="bg-surface-container-low py-section-gap-mobile">
+<div class="container mx-auto px-margin-mobile">
+<div class="max-w-3xl mx-auto text-center mb-12">
+<h2 class="font-headline-md-mobile text-headline-md-mobile text-primary mb-4 md:text-headline-md">
+<span data-lang="zh">身为主管或燕农的你，是否也面对这些天天烧钱的“燕屋噩梦”？</span>
+<span data-lang="en">As a Manager or Farmer, Are You Facing These Daily "Swiftlet House Nightmares"?</span>
+</h2>
+<div class="w-24 h-1 bg-secondary mx-auto"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Problem Card 1 -->
+<div class="bg-white p-8 rounded-xl shadow-sm border-t-4 border-error">
+<div class="text-error mb-4">
+<span class="material-symbols-outlined text-4xl">sentiment_very_dissatisfied</span>
+</div>
+<h3 class="font-headline-md-mobile text-headline-md-mobile text-primary mb-3">
+<span data-lang="zh">痛点 1：燕子来了就走？</span>
+<span data-lang="en">Pain Point 1: Birds Leave Immediately?</span>
+</h3>
+<p class="text-on-surface-variant">
+<span data-lang="zh">新屋水泥味太重，空气浑浊，燕子转两圈感觉不安全立马飞走，留燕率迟迟不涨。</span>
+<span data-lang="en">Strong cement smell in new houses, stale air. Birds circle twice, feel unsafe and fly away, leading to zero occupancy growth.</span>
+</p>
+</div>
+<!-- Problem Card 2 -->
+<div class="bg-white p-8 rounded-xl shadow-sm border-t-4 border-error">
+<div class="text-error mb-4">
+<span class="material-symbols-outlined text-4xl">warning</span>
+</div>
+<h3 class="font-headline-md-mobile text-headline-md-mobile text-primary mb-3">
+<span data-lang="zh">痛点 2：亚硝酸盐超标！</span>
+<span data-lang="en">Pain Point 2: High Nitrite Levels!</span>
+</h3>
+<p class="text-on-surface-variant">
+<span data-lang="zh">燕粪堆积异味熏天，吸引小黑虫导致毛燕发黄、品质下跌，辛苦一整年却卖不到好价钱。</span>
+<span data-lang="en">Manure accumulation creates foul odors and attracts pests, causing nests to yellow and drop in quality. A year's work for poor prices.</span>
+</p>
+</div>
+<!-- Problem Card 3 -->
+<div class="bg-white p-8 rounded-xl shadow-sm border-t-4 border-error">
+<div class="text-error mb-4">
+<span class="material-symbols-outlined text-4xl">block</span>
+</div>
+<h3 class="font-headline-md-mobile text-headline-md-mobile text-primary mb-3">
+<span data-lang="zh">痛点 3：化学药剂伤鸟？</span>
+<span data-lang="en">Pain Point 3: Harmful Chemicals?</span>
+</h3>
+<p class="text-on-surface-variant">
+<span data-lang="zh">市面上药剂多含无味化学成分，长久使用会刺激到燕子幼鸟慢性病死去，导致环境恶化吸引不到新燕子留下。</span>
+<span data-lang="en">Many commercial agents contain chemicals that irritate fledglings, leading to chronic illness or death, worsening the environment and deterring new birds.</span>
+</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Solution Section -->
+<section class="py-section-gap-mobile bg-white">
+<div class="container mx-auto px-margin-mobile grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+<div class="order-2 md:order-1">
+<div class="grid grid-cols-2 gap-4">
+<div class="p-6 bg-secondary/5 rounded-xl space-y-3">
+<div class="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center">
+<span class="material-symbols-outlined">nature</span>
+</div>
+<h4 class="font-bold text-primary">
+<span data-lang="zh">打造燕子最爱生态香气</span>
+<span data-lang="en">Create Natural Ecological Scent</span>
+</h4>
+<p class="text-label-sm text-on-surface-variant">
+<span data-lang="zh">模拟大自然原始栖息环境气场</span>
+<span data-lang="en">Mimics natural primitive nesting environment</span>
+</p>
+</div>
+<div class="p-6 bg-secondary/5 rounded-xl space-y-3">
+<div class="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center">
+<span class="material-symbols-outlined">clean_hands</span>
+</div>
+<h4 class="font-bold text-primary">
+<span data-lang="zh">强效降解亚硝酸盐</span>
+<span data-lang="en">Powerful Nitrite Degradation</span>
+</h4>
+<p class="text-label-sm text-on-surface-variant">
+<span data-lang="zh">减轻重金属元素，提升燕窝等级</span>
+<span data-lang="en">Reduces heavy metals, improves nest grade</span>
+</p>
+</div>
+<div class="p-6 bg-secondary/5 rounded-xl space-y-3">
+<div class="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center">
+<span class="material-symbols-outlined">eco</span>
+</div>
+<h4 class="font-bold text-primary">
+<span data-lang="zh">100% 绿色天然安全</span>
+<span data-lang="en">100% Green, Natural &amp; Safe</span>
+</h4>
+<p class="text-label-sm text-on-surface-variant">
+<span data-lang="zh">对幼鸟和人畜完全无害</span>
+<span data-lang="en">Harmless to fledglings, humans, and livestock</span>
+</p>
+</div>
+<div class="p-6 bg-secondary/5 rounded-xl space-y-3">
+<div class="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center">
+<span class="material-symbols-outlined">touch_app</span>
+</div>
+<h4 class="font-bold text-primary">
+<span data-lang="zh">新手也能轻松操作</span>
+<span data-lang="en">Easy Operation for Beginners</span>
+</h4>
+<p class="text-label-sm text-on-surface-variant">
+<span data-lang="zh">简单喷洒，省时省力省心，1L 可喷施3000方尺范围</span>
+<span data-lang="en">Simple spray, saves time &amp; effort. 1L covers 3000 sq ft</span>
+</p>
+</div>
+</div>
+</div>
+<div class="order-1 md:order-2 space-y-6">
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-primary">
+<span data-lang="zh">燕宝菌酵素 1L：<br class=""/><span class="text-secondary">您的燕屋绿色守护者</span></span>
+<span data-lang="en">Yan Bao Enzyme 1L:<br class=""/><span class="text-secondary">Your Green Guardian for Swiftlet Houses</span></span>
+</h2>
+<p class="text-body-lg text-on-surface-variant">
+<span data-lang="zh">我们采用高活性微生物酶技术，从根源分解产生异味的有机物，而非单纯掩盖。它能为燕屋建立稳定的生态平衡，让燕子更有安全感，从而提生产率与留存率。</span>
+<span data-lang="en">We use high-activity microbial enzyme technology to decompose odor-causing organic matter at the source, rather than just masking it. It establishes a stable ecological balance, giving birds a sense of security to increase productivity and retention.</span>
+</p>
+<ul class="space-y-3">
+<li class="flex items-center gap-2 text-secondary font-bold">
+<span class="material-symbols-outlined">check_circle</span>
+<span data-lang="zh">经过生物降解实验室认证</span>
+<span data-lang="en">Certified by Biodegradation Laboratories</span>
+</li>
+<li class="flex items-center gap-2 text-secondary font-bold">
+<span class="material-symbols-outlined">check_circle</span>
+<span data-lang="zh">已帮助超过 20000+ 间燕屋成功转型</span>
+<span data-lang="en">Helped 20,000+ swiftlet houses successfully transform</span>
+</li>
+<li class="flex items-center gap-2 text-secondary font-bold">
+<span class="material-symbols-outlined">verified</span>
+<span data-lang="zh">11年市场深耕：行业老品牌，价格透明稳定</span>
+<span data-lang="en">11 Years Market Presence: Established brand with transparent pricing</span>
+</li></ul>
+</div>
+</div>
+</section>
+<!-- Social Proof Section -->
+<section class="bg-surface-container py-section-gap-mobile">
+<div class="container mx-auto px-margin-mobile">
+<div class="text-center mb-12">
+<h2 class="font-headline-md text-primary mb-2">
+<span data-lang="zh">看看用过 EJS 燕宝菌的老鸟和新手燕农怎么说！</span>
+<span data-lang="en">Hear What Veteran and Newbie Farmers Say About EJS Yan Bao!</span>
+</h2>
+<p class="text-on-surface-variant">
+<span data-lang="zh">真实反馈，见证品质的飞跃</span>
+<span data-lang="en">Real feedback, witnessing a leap in quality</span>
+</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Testimonial 1 -->
+<div class="bg-white p-6 rounded-xl shadow-sm">
+<div class="flex items-center gap-4 mb-4">
+<img class="w-16 h-16 rounded-full object-cover" data-alt="A professional middle-aged male bird's nest farmer smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClDL7M5vWkISeIE1fA4B8a3kjNXeG27IKT6ykfaV6GPDHGK9lHkaClxkciRGa-1YyfxBWwDgTSqu756V9-kEXopMYYQ6vEeGHSOedCnML1cqt6wev0T8cbztCaA9q_A5DPomJ3oViH2Jl4S9yfkIRGu7Le21M_0cp_JutVskHTg1E5y-IHfTb4m13d9mi_frgRQaU_BOxqnLEhw3nSm4o9VkHaC8sauX5hsN_Vq8J46vTW_wKaFXIRTIiPdFQdRlYDcsEVgdii6zZK"/>
+<div>
+<h4 class="font-bold text-primary">
+<span data-lang="zh">陈大哥</span>
+<span data-lang="en">Mr. Chen</span>
+</h4>
+<p class="text-label-sm text-on-surface-variant">
+<span data-lang="zh">20年经验老燕农</span>
+<span data-lang="en">20 Years Experience Veteran</span>
+</p>
+</div>
+</div>
+<p class="text-body-md italic text-on-surface">
+<span data-lang="zh">"之前用了各种牌子喷雾燕子还是不回来，用了 EJS燕宝菌酵素 3个月，新鸟开始在天花板‘驻足’了，燕窝的颜色也白了很多，真心推荐！"</span>
+<span data-lang="en">"I tried various sprays but birds didn't return. After 3 months with EJS Yan Bao, new birds are 'staying' on the ceiling, and nest colors are much whiter. Highly recommended!"</span>
+</p>
+<div class="flex mt-4 text-secondary">
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+</div>
+</div>
+<!-- Testimonial 2 -->
+<div class="bg-white p-6 rounded-xl shadow-sm">
+<div class="flex items-center gap-4 mb-4">
+<img class="w-16 h-16 rounded-full object-cover" data-alt="A young female professional agricultural consultant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1zwHnZJcqIVONFWjOwzTjx8Nwq0CsFpMZhbaKlxFtRlr_w2ZTY5jzHk8Whg2K5ohAITmEw6BbyFVmHAEpu0hfWCGsC-GOYoSs3wA9ZPQCaZQ6BmB3n_bEQJU-htj1zDzsDF9NmQfY8pLGcPS9QglTJEl5QJjmYN34IxmFAqN0PzZNt9UU2eQ_gxQkrio9LX06E5Be0SI22Q-i1Ak0Xptz7R6d25hfkS_ih9WPpJoRKVEN8utq1Jp1oj8SEw5xCY6Bmx0R8awWy_nq"/>
+<div>
+<h4 class="font-bold text-primary">
+<span data-lang="zh">Miss Lee</span>
+<span data-lang="en">Miss Lee</span>
+</h4>
+<p class="text-label-sm text-on-surface-variant">
+<span data-lang="zh">新手燕屋投资者</span>
+<span data-lang="en">Newbie Investor</span>
+</p>
+</div>
+</div>
+<p class="text-body-md italic text-on-surface">
+<span data-lang="zh">"刚开始管理燕屋最怕就是留不住燕子。EJS 的专家咨询非常专业，教我怎么通过燕宝菌系列产品配合调理环境，现在留燕率每个月都在稳步上升。"</span>
+<span data-lang="en">"Managing a house, my biggest fear was not keeping birds. EJS experts are professional, teaching me how to condition the environment with their products. Retention is rising steadily every month."</span>
+</p>
+<div class="flex mt-4 text-secondary">
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+</div>
+</div>
+<!-- Testimonial 3 -->
+<div class="bg-white p-6 rounded-xl shadow-sm">
+<div class="flex items-center gap-4 mb-4">
+<img class="w-16 h-16 rounded-full object-cover" data-alt="A mature man with glasses representing a technical expert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZW56uTCPz0pE1ZDWeK4Ks1m7CmbzyeFjtkK2nqK6Nq4LhzxYxpcw8JuB1NX4NpSSMABfMXi0GnqFQtDrSaKyr31_0ckS7oGZeV_wvSTxGi27jl78Yqm4BaM0ElwIW6xFJJCr3p5BDhr2kgqjAWuFisvjK0X93WI5jfu-JoaeowxnLZj6E505dXMNvqaq8Hdv_Z21LuwQ75y_pmsdOp73XPr7wHB6rPyeZvHCW-WTur1Xi9R4oLCR_eBUzjZrbjp4V3ZmoufLttVZc"/>
+<div>
+<h4 class="font-bold text-primary">
+<span data-lang="zh">黄先生</span>
+<span data-lang="en">Mr. Huang</span>
+</h4>
+<p class="text-label-sm text-on-surface-variant">
+<span data-lang="zh">燕屋管理主管</span>
+<span data-lang="en">Swiftlet Management Lead</span>
+</p>
+</div>
+</div>
+<p class="text-body-md italic text-on-surface">
+<span data-lang="zh">"解决毛燕窝品质问题是关键。经过吴总的协助下，我们的毛燕窝品质漂亮，收购价自然高出一大截，投资回报率显著提高。"</span>
+<span data-lang="en">"Solving quality issues is key. With Mr. Wu's help, our raw nests look beautiful, and purchase prices are much higher. Our ROI has improved significantly."</span>
+</p>
+<div class="flex mt-4 text-secondary">
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+<span class="material-symbols-outlined fill">star</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- YouTube Section -->
+<section class="py-8 bg-background">
+<div class="container mx-auto px-margin-mobile max-w-container-max"><div class="text-center mb-10">
+<h2 class="font-headline-md text-primary mb-2">
+<span data-lang="zh">有关【语燕之约】的 YouTube 视频</span>
+<span data-lang="en">YouTube Videos About [Yu Yan Zhi Yue]</span>
+</h2>
+<div class="w-24 h-1 bg-secondary mx-auto"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-xl">
+<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="" class="absolute inset-0 w-full h-full" frameborder="0" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/KaxJbPQrdpg" title="YouTube video player"></iframe>
+</div>
+<div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-xl">
+<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="" class="absolute inset-0 w-full h-full" frameborder="0" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/ZFr610CA-5w" title="YouTube video player"></iframe>
+</div>
+</div></div>
+</section>
+<!-- Offer Section -->
+<section class="py-section-gap-mobile bg-primary text-white overflow-hidden relative" id="offer">
+<div class="absolute top-0 right-0 w-64 h-64 bg-secondary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+<div class="container mx-auto px-margin-mobile relative z-10">
+<div class="max-w-4xl mx-auto bg-white/5 backdrop-blur-md rounded-2xl p-8 md:p-12 border border-white/10 shadow-2xl">
+<div class="text-center mb-10">
+<h2 class="font-display-lg-mobile text-display-lg-mobile mb-4">
+<span data-lang="zh">生态维护大礼包</span>
+<span data-lang="en">Eco-Maintenance Bundle</span>
+</h2>
+<div class="inline-block bg-secondary px-6 py-2 rounded-full font-bold">
+<span data-lang="zh">专为今日抢先预定的燕农准备</span>
+<span data-lang="en">Exclusive for Today's Early Bookings</span>
+</div>
+</div>
+<div class="space-y-6 mb-12">
+<div class="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary">liquor</span>
+<span class="">
+<span data-lang="zh">EJS 燕宝菌酵素 1L<br/> (2瓶)</span>
+<span data-lang="en">EJS Yan Bao Enzyme 1L<br/> (2 Bottles)</span>
+</span>
+</div>
+<span class="font-bold">RM118</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary">support_agent</span>
+<span class="">
+<span data-lang="zh">1对1<br/>燕屋环境诊断咨询</span>
+<span data-lang="en">1-on-1<br/>Env Diagnostic Consultation</span>
+</span>
+</div>
+<span class="font-bold">RM200</span>
+</div>
+<div class="pt-6 flex flex-col md:flex-row items-center justify-center gap-4 border-t border-white/10">
+<span class="text-xl line-through text-on-surface-variant">
+<span data-lang="zh">总价值：RM318</span>
+<span data-lang="en">Total Value: RM318</span>
+</span>
+<span class="text-3xl font-extrabold text-secondary-fixed text-center">
+<span data-lang="zh">今天专享价：<br/>2瓶只需 RM100！</span>
+<span data-lang="en">Today's Special:<br/>2 Bottles for RM100!</span>
+</span>
+</div>
+</div>
+<div class="text-center space-y-6">
+<div class="flex items-center justify-center gap-2 text-brand-orange font-bold text-lg animate-bounce">
+<span class="material-symbols-outlined">timer</span>
+<span data-lang="zh">⚠️ 限量 50 份！截止日期：2026年8月31号</span>
+<span data-lang="en">⚠️ Limited 50 Sets! Ends: 31 Aug 2026</span>
+</div>
+<a class="inline-flex items-center justify-center bg-brand-orange text-white font-bold text-xl px-12 py-6 rounded-2xl shadow-xl hover:bg-orange-600 transition-all w-full md:w-auto" href="https://wa.link/kgrch0">
+<span data-lang="zh">🛒 【仅限50组】立即抢购套装</span>
+<span data-lang="en">🛒 [Only 50 Sets] Buy Bundle Now</span>
+</a>
+<p class="text-label-sm text-on-surface-variant opacity-70">
+<span data-lang="zh">点击后将跳转至 WhatsApp 进行快速下单与名额确认</span>
+<span data-lang="en">Clicking will redirect to WhatsApp for quick ordering</span>
+</p>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="py-section-gap-mobile bg-background">
+<div class="container mx-auto px-margin-mobile max-w-3xl">
+<h2 class="font-headline-md text-primary text-center mb-10">
+<span data-lang="zh">常见问题 (FAQ)</span>
+<span data-lang="en">Frequently Asked Questions (FAQ)</span>
+</h2>
+<div class="space-y-4">
+<!-- Q1 -->
+<div class="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<button class="w-full px-6 py-4 flex justify-between items-center text-left hover:bg-surface-container transition-colors font-bold text-primary" onclick="toggleFaq(1)">
+<span class="">
+<span data-lang="zh">1. 喷洒 EJS 燕宝菌产品会不会惊吓到正在燕屋里面的燕子？</span>
+<span data-lang="en">1. Does spraying EJS products scare away the birds inside?</span>
+</span>
+<span class="material-symbols-outlined" id="faq-icon-1">expand_more</span>
+</button>
+<div class="px-6 pb-6 text-on-surface-variant hidden" id="faq-content-1">
+<span data-lang="zh">绝对不会。EJS 采用天然生物菌，不含刺鼻的化学挥发物。其味道非常芳香温和，甚至能模拟大自然的森林气息，让燕子感到放松安全。</span>
+<span data-lang="en">Absolutely not. EJS uses natural bio-bacteria with no pungent chemicals. The scent is mild and fragrant, mimicking natural forest air to help birds feel relaxed and safe.</span>
+</div>
+</div>
+<!-- Q2 -->
+<div class="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<button class="w-full px-6 py-4 flex justify-between items-center text-left hover:bg-surface-container transition-colors font-bold text-primary" onclick="toggleFaq(2)">
+<span class="">
+<span data-lang="zh">2. 这种酵素主要针对什么样的燕屋环境？</span>
+<span data-lang="en">2. What kind of environments is this enzyme best for?</span>
+</span>
+<span class="material-symbols-outlined" id="faq-icon-2">expand_more</span>
+</button>
+<div class="px-6 pb-6 text-on-surface-variant hidden" id="faq-content-2">
+<span data-lang="zh">适用于所有类型的燕屋。无论是新屋除味、旧屋翻新降解亚硝酸盐、还是日常环境维护。特别是对那些异味重、留燕率长期停滞不前的燕屋效果尤为显著。</span>
+<span data-lang="en">Suitable for all types of houses. From odor removal in new houses to nitrite degradation in renovations or daily maintenance. Especially effective for houses with strong odors or stagnant occupancy.</span>
+</div>
+</div>
+<!-- Q3 -->
+<div class="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<button class="w-full px-6 py-4 flex justify-between items-center text-left hover:bg-surface-container transition-colors font-bold text-primary" onclick="toggleFaq(3)">
+<span class="">
+<span data-lang="zh">3. 购买套装后如何预约专家咨询？</span>
+<span data-lang="en">3. How do I book the expert consultation after purchase?</span>
+</span>
+<span class="material-symbols-outlined" id="faq-icon-3">expand_less</span>
+</button>
+<div class="px-6 pb-6 text-on-surface-variant" id="faq-content-3">
+<span data-lang="zh">下单成功后，我们的系统会自动分配一名资深燕屋顾问。您可以通过 WhatsApp 发送您的燕屋内部照片或视频，顾问将为您提供定制化的环境升级建议。</span>
+<span data-lang="en">After ordering, a senior consultant will be assigned. You can send photos/videos of your house via WhatsApp for customized environment upgrade advice.</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Inquiry Form Section -->
+<section class="py-section-gap-mobile bg-white">
+<div class="container mx-auto px-margin-mobile max-w-3xl">
+<div class="text-center mb-10">
+<h2 class="font-headline-md text-primary mb-2">
+<span data-lang="zh">提交您的咨询</span>
+<span data-lang="en">Submit Your Inquiry</span>
+</h2>
+<p class="text-on-surface-variant">
+<span data-lang="zh">填写下方表格，我们的专家将尽快与您联系</span>
+<span data-lang="en">Fill out the form below, our experts will contact you shortly</span>
+</p>
+</div>
+<div class="bg-surface-container-low rounded-2xl overflow-hidden shadow-sm">
+<iframe class="w-full min-h-[500px]" frameborder="0" height="500" marginheight="0" marginwidth="0" src="https://tally.so/embed/2EoyXD?alignLeft=1&amp;hideTitle=1&amp;transparentBackground=1&amp;dynamicHeight=1" title="Submit Your Inquiry" width="100%"></iframe>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-primary text-white pt-section-gap-mobile pb-10">
+<div class="container mx-auto px-margin-mobile">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<img alt="EJS Logo" class="h-12 w-12 brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAX4RY0ctzA85QsL4orjJHXTpHXuolc5EPwhBlCPJ-4G5ThDDZI9BO_5u4zGP6XR-zMzewXiSiKjqNaZx6x98fkOqq2h-EBSrTt0T95sHbpwdANCGnGuK6GwmUbKsnpPOHdrkDdykrMqLfYANy1JpWK34WG6jK-Sglrtjhlv04sJtmP8eaoheiTE0B5tM9-1Y2XW21A_Kfkv6aJ3xL0TBmoZu8fGtvmAIg9fVyVjWRD2WjEHyNd5JGapWUftGeFc16JTKjg6hWf5XO9LL4"/>
+<span class="text-headline-md font-bold">EJS Agrotech Resources<br/><span data-lang-inline="zh">亿佳农科资源</span><span data-lang-inline="en">EJS Agrotech Resources</span></span>
+</div>
+<p class="max-w-xs text-on-primary-container">
+<span data-lang="zh">您的燕屋生态健康专家。致力于用生物技术赋能现代农业，让燕农获得更高收益。</span>
+<span data-lang="en">Your swiftlet house health expert. Committed to empowering agriculture with biotechnology for better farmer returns.</span>
+</p>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-bold">
+<span data-lang="zh">联系我们</span>
+<span data-lang="en">Contact Us</span>
+</h4>
+<a class="flex items-center gap-2 hover:text-secondary-fixed transition-colors" href="tel:+60129286288"><span class="material-symbols-outlined">call</span>
+<span data-lang-inline="zh">EJS (亿佳) 燕屋咨询师 ：+6012-9286288</span>
+<span data-lang-inline="en">EJS Consultant: +6012-9286288</span>
+</a>
+<a class="flex items-center gap-2 hover:text-secondary-fixed transition-colors" href="mailto:ejsagrotechresources@gmail.com"><span class="material-symbols-outlined">mail</span>
+<span data-lang-inline="zh">客户服务热线 ejsagrotechresources@gmail.com</span>
+<span data-lang-inline="en">CS Email: ejsagrotechresources@gmail.com</span>
+</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-bold">
+<span data-lang="zh">快捷链接</span>
+<span data-lang="en">Quick Links</span>
+</h4>
+<a class="hover:underline" href="#">Terms &amp; Conditions</a>
+<a class="hover:underline" href="#">Privacy Policy</a>
+<a class="hover:underline" href="#">Shipping &amp; Returns</a>
+</div>
+</div>
+<div class="pt-8 border-t border-white/10 text-center text-label-sm text-on-primary-container"> All Rights Reserved. 
+    <span data-lang-inline="zh">燕宝菌酵素版权所有.</span>
+<span data-lang-inline="en">Yan Bao Enzyme.</span>
+</div>
+</div>
+</footer>
+<!-- Floating action -->
+<div class="fixed bottom-6 right-6 z-50 md:hidden">
+<a class="w-16 h-16 bg-secondary text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform" href="https://wa.me/60129286288">
+<span class="material-symbols-outlined text-3xl">chat</span>
+</a>
+</div>
+<script>
+    function toggleLanguage() {
+        document.body.classList.toggle('lang-en');
+        const isEn = document.body.classList.contains('lang-en');
+        document.documentElement.lang = isEn ? 'en' : 'zh-CN';
+    }
+
+    function toggleFaq(id) {
+        const content = document.getElementById(`faq-content-${id}`);
+        const icon = document.getElementById(`faq-icon-${id}`);
+        const isHidden = content.classList.contains('hidden');
+        
+        // Close all first
+        document.querySelectorAll('[id^="faq-content-"]').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('[id^="faq-icon-"]').forEach(el => el.textContent = 'expand_more');
+
+        if (isHidden) {
+            content.classList.remove('hidden');
+            icon.textContent = 'expand_less';
+        }
+    }
+</script>
+</body></html>
